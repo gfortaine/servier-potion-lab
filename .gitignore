@@ -1,0 +1,16 @@
+node_modules/
+dist/
+.next/
+.turbo/
+coverage/
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+npm-debug.log*
+pnpm-debug.log*
+.ralphex/
+.stitch/
+playwright-report/
+test-results/
+.vercel

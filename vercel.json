@@ -1,0 +1,20 @@
+{
+  "experimentalServices": {
+    "web": {
+      "entrypoint": "apps/web",
+      "routePrefix": "/",
+      "framework": "nextjs"
+    },
+    "api": {
+      "entrypoint": "apps/api",
+      "routePrefix": "/api",
+      "framework": "express",
+      "memory": 1024,
+      "maxDuration": 30,
+      "includeFiles": [
+        "packages/db/prisma/schema.prisma",
+        "packages/db/prisma/migrations/**"
+      ]
+    }
+  }
+}

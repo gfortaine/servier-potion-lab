@@ -1,0 +1,43 @@
+{
+  "name": "servier-potion-lab",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Production-shaped SERVIER potion lab technical test built through the Copilot-native loop harness.",
+  "type": "module",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "node scripts/dev-stack.mjs",
+    "dev:raw": "turbo run dev",
+    "lint": "turbo run lint",
+    "start:api": "node scripts/preflight.mjs --api-only && pnpm --filter @servier-potion-lab/api start",
+    "start:web": "node scripts/preflight.mjs --web-only && pnpm --filter @servier-potion-lab/web start",
+    "db:migrate": "pnpm --filter @servier-potion-lab/db db:migrate",
+    "db:seed": "pnpm --filter @servier-potion-lab/db db:seed",
+    "db:reset": "pnpm db:migrate && pnpm db:seed",
+    "test:e2e:api": "node scripts/with-postgres.mjs pnpm --filter @servier-potion-lab/api test:e2e",
+    "test:codex:runtime": "node scripts/with-postgres.mjs pnpm --filter @servier-potion-lab/api test:codex:runtime",
+    "test:e2e:playwright:inner": "NEXT_PUBLIC_API_BASE_URL=http://127.0.0.1:3001 pnpm build && pnpm exec playwright test",
+    "test:e2e:playwright": "node scripts/with-postgres.mjs pnpm test:e2e:playwright:inner",
+    "test:e2e": "pnpm test:e2e:api && pnpm test:e2e:playwright",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "verify:scaffold": "node scripts/verify-scaffold.mjs",
+    "verify": "turbo run lint typecheck test build && pnpm verify:scaffold && pnpm test:e2e",
+    "stitch:redesign": "node scripts/stitch-redesign.mjs"
+  },
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "packageManager": "pnpm@10.11.0",
+  "pnpm": {
+    "overrides": {
+      "js-yaml": "4.2.0",
+      "multer": "2.2.0"
+    }
+  },
+  "devDependencies": {
+    "@google/stitch-sdk": "^0.3.5",
+    "@playwright/test": "^1.57.0",
+    "turbo": "^2.9.18"
+  }
+}
