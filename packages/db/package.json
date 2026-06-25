@@ -1,0 +1,33 @@
+{
+  "name": "@servier-potion-lab/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@servier-potion-lab/domain": "workspace:*",
+    "@prisma/client": "^6.19.1"
+  },
+  "scripts": {
+    "generate": "prisma generate --schema prisma/schema.prisma",
+    "build": "pnpm generate && tsc -p tsconfig.json",
+    "lint": "pnpm generate && tsc -p tsconfig.json --noEmit",
+    "typecheck": "pnpm generate && tsc -p tsconfig.json --noEmit",
+    "test": "pnpm build && node --test dist/**/*.test.js",
+    "db:migrate": "pnpm generate && prisma migrate deploy --schema prisma/schema.prisma",
+    "db:seed": "pnpm build && node dist/seed.js"
+  },
+  "devDependencies": {
+    "@servier-potion-lab/typescript-config": "workspace:*",
+    "@types/node": "^24.10.1",
+    "prisma": "^6.19.1",
+    "typescript": "^5.9.3"
+  }
+}

@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Ingredient {
+  id            String         @id
+  name          String
+  createdAt     DateTime       @default(now()) @map("created_at")
+  updatedAt     DateTime       @updatedAt @map("updated_at")
+  inventoryItem InventoryItem?
+
+  @@map("ingredients")
+}
+
+model Recipe {
+  id            String   @id
+  name          String
+  ingredientIds String[] @map("ingredient_ids")
+  createdAt     DateTime @default(now()) @map("created_at")
+  potions       Potion[]
+
+  @@map("recipes")
+}
+
+model InventoryItem {
+  ingredientId String     @id @map("ingredient_id")
+  quantity     Int
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id], onDelete: Restrict)
+
+  @@map("inventory_items")
+}
+
+model Potion {
+  id            String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  recipeId      String   @map("recipe_id")
+  name          String
+  ingredientIds String[] @map("ingredient_ids")
+  createdAt     DateTime @default(now()) @map("created_at")
+  recipe        Recipe   @relation(fields: [recipeId], references: [id], onDelete: Restrict)
+
+  @@map("potions")
+}
