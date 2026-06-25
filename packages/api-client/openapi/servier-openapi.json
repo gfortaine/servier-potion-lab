@@ -1,0 +1,716 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "AppController_health",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/ready": {
+      "get": {
+        "operationId": "AppController_ready",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "App"
+        ]
+      }
+    },
+    "/assistant/ask": {
+      "post": {
+        "operationId": "AssistantController_ask",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "question"
+                ],
+                "properties": {
+                  "question": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 600
+                  },
+                  "inventorySummary": {
+                    "type": "string",
+                    "maxLength": 600
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "A deterministic local RAG answer."
+          },
+          "400": {
+            "description": "Invalid assistant request."
+          },
+          "404": {
+            "description": "Assistant is disabled by environment."
+          }
+        },
+        "summary": "Ask the env-gated LangGraph local RAG assistant.",
+        "tags": [
+          "LangGraph Assistant"
+        ]
+      }
+    },
+    "/assistant/chat": {
+      "post": {
+        "operationId": "AssistantController_chat",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssistantChatRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "A structured create_potion tool-backed chat response.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssistantChatResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid chat request."
+          }
+        },
+        "summary": "Create potions through the real-model SERVIER Codex chat.",
+        "tags": [
+          "LangGraph Assistant"
+        ]
+      }
+    },
+    "/assistant/chat/stream": {
+      "post": {
+        "operationId": "AssistantController_streamChat",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssistantChatStreamRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "An AI SDK UI message stream."
+          },
+          "400": {
+            "description": "Invalid chat stream request."
+          }
+        },
+        "summary": "Stream a real conversational Codex chat response with AI SDK UI messages.",
+        "tags": [
+          "LangGraph Assistant"
+        ]
+      }
+    },
+    "/ingredients": {
+      "get": {
+        "operationId": "PotionLabController_listIngredients",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "All available ingredients.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/IngredientDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List the 14 SERVIER ingredients.",
+        "tags": [
+          "Potion Lab"
+        ]
+      }
+    },
+    "/inventory": {
+      "get": {
+        "operationId": "PotionLabController_listInventory",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The current inventory.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InventoryItemDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List inventory quantities for all ingredients.",
+        "tags": [
+          "Potion Lab"
+        ]
+      }
+    },
+    "/inventory/{ingredientId}": {
+      "put": {
+        "operationId": "PotionLabController_setInventoryQuantity",
+        "parameters": [
+          {
+            "name": "ingredientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "quantity"
+                ],
+                "properties": {
+                  "quantity": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated inventory item.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryItemDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid quantity."
+          },
+          "404": {
+            "description": "Unknown ingredient."
+          }
+        },
+        "summary": "Set an ingredient inventory quantity.",
+        "tags": [
+          "Potion Lab"
+        ]
+      }
+    },
+    "/inventory/{ingredientId}/recharge": {
+      "post": {
+        "operationId": "PotionLabController_recharge",
+        "parameters": [
+          {
+            "name": "ingredientId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "amount": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "default": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The recharged inventory item.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryItemDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid recharge amount."
+          },
+          "404": {
+            "description": "Unknown ingredient."
+          }
+        },
+        "summary": "Increase one ingredient quantity.",
+        "tags": [
+          "Potion Lab"
+        ]
+      }
+    },
+    "/inventory/randomize": {
+      "post": {
+        "operationId": "PotionLabController_randomizeInventory",
+        "parameters": [],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "minimum": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "default": 1
+                  },
+                  "maximum": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "default": 5
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The randomized inventory.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InventoryItemDto"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid randomization bounds."
+          }
+        },
+        "summary": "Randomize inventory quantities for game replay.",
+        "tags": [
+          "Potion Lab"
+        ]
+      }
+    },
+    "/recipes": {
+      "get": {
+        "operationId": "PotionLabController_listRecipes",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "All recipes.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RecipeDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List the 9 recipes and discovery state.",
+        "tags": [
+          "Potion Lab"
+        ]
+      }
+    },
+    "/potions": {
+      "get": {
+        "operationId": "PotionLabController_listPotions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Potion creation history.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PotionDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "List created potion history.",
+        "tags": [
+          "Potion Lab"
+        ]
+      },
+      "post": {
+        "operationId": "PotionLabController_createPotion",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "ingredientIds"
+                ],
+                "properties": {
+                  "ingredientIds": {
+                    "type": "array",
+                    "minItems": 3,
+                    "maxItems": 3,
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The created potion.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PotionDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid selection, missing recipe, or insufficient stock."
+          }
+        },
+        "summary": "Create a potion from exactly three ingredient IDs.",
+        "tags": [
+          "Potion Lab"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "SERVIER Potion Lab API",
+    "description": "Inventory, recipe, and potion endpoints for the SERVIER technical test.",
+    "version": "0.1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [
+    {
+      "url": "http://localhost:3001"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "AssistantChatRequestDto": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 600,
+            "example": "Prépare une potion d'invisibilité"
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "fr",
+              "en"
+            ],
+            "default": "fr",
+            "example": "fr"
+          }
+        },
+        "required": [
+          "message"
+        ]
+      },
+      "AssistantToolUiDto": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "example": "potion-created-card"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "AssistantToolCallDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "create_potion"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "success",
+              "error"
+            ],
+            "example": "success"
+          },
+          "stateChanged": {
+            "type": "boolean",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "example": "Potion d'invisibilité validée et ajoutée au registre."
+          },
+          "data": {
+            "type": "object",
+            "additionalProperties": true,
+            "example": {
+              "potion": {
+                "recipeId": "invisibilite",
+                "name": "Potion d'invisibilité"
+              }
+            }
+          },
+          "ui": {
+            "$ref": "#/components/schemas/AssistantToolUiDto"
+          }
+        },
+        "required": [
+          "name",
+          "status",
+          "stateChanged",
+          "message",
+          "data",
+          "ui"
+        ]
+      },
+      "AssistantChatResponseDto": {
+        "type": "object",
+        "properties": {
+          "answer": {
+            "type": "string",
+            "example": "Potion d'invisibilité validée et ajoutée au registre."
+          },
+          "intent": {
+            "type": "string",
+            "example": "create_potion"
+          },
+          "toolCalls": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssistantToolCallDto"
+            }
+          },
+          "liveProviderUsed": {
+            "type": "boolean",
+            "example": true
+          }
+        },
+        "required": [
+          "answer",
+          "intent",
+          "toolCalls",
+          "liveProviderUsed"
+        ]
+      },
+      "AssistantChatStreamRequestDto": {
+        "type": "object",
+        "properties": {
+          "messages": {
+            "description": "AI SDK UI messages sent by useChat.",
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "locale": {
+            "type": "string",
+            "enum": [
+              "fr",
+              "en"
+            ],
+            "default": "fr",
+            "example": "fr"
+          }
+        },
+        "required": [
+          "messages"
+        ]
+      },
+      "IngredientDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "noix-de-coco"
+          },
+          "name": {
+            "type": "string",
+            "example": "Noix de coco"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "InventoryItemDto": {
+        "type": "object",
+        "properties": {
+          "ingredientId": {
+            "type": "string",
+            "example": "noix-de-coco"
+          },
+          "name": {
+            "type": "string",
+            "example": "Noix de coco"
+          },
+          "quantity": {
+            "type": "number",
+            "minimum": 0,
+            "example": 3
+          }
+        },
+        "required": [
+          "ingredientId",
+          "name",
+          "quantity"
+        ]
+      },
+      "RecipeDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "invisibilite"
+          },
+          "name": {
+            "type": "string",
+            "example": "Potion d'invisibilité"
+          },
+          "ingredientIds": {
+            "minItems": 3,
+            "maxItems": 3,
+            "example": [
+              "noix-de-coco",
+              "yttrium",
+              "mandragore"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "discovered": {
+            "type": "boolean",
+            "example": false
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "ingredientIds",
+          "discovered"
+        ]
+      },
+      "PotionDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "example": "4a8d4d42-2c47-4a3a-9e28-9639dc7c5f52"
+          },
+          "recipeId": {
+            "type": "string",
+            "example": "invisibilite"
+          },
+          "name": {
+            "type": "string",
+            "example": "Potion d'invisibilité"
+          },
+          "ingredientIds": {
+            "minItems": 3,
+            "maxItems": 3,
+            "example": [
+              "noix-de-coco",
+              "yttrium",
+              "mandragore"
+            ],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2026-06-21T00:00:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "recipeId",
+          "name",
+          "ingredientIds",
+          "createdAt"
+        ]
+      }
+    }
+  }
+}

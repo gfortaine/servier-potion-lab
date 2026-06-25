@@ -1,0 +1,49 @@
+{
+  "name": "@servier-potion-lab/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "node ../../scripts/vercel-db-release.mjs && tsc -p tsconfig.json",
+    "dev": "tsc-watch -p tsconfig.json --onSuccess \"node dist/main.js\"",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "pnpm build && node --test dist/**/*.test.js",
+    "test:e2e": "pnpm build && node --test dist/**/*.e2e.js",
+    "test:codex:runtime": "pnpm build && node dist/codex-runtime-proof.js",
+    "export:openapi": "pnpm build && node dist/export-openapi.js",
+    "start": "node dist/main.js"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "^3.0.74",
+    "@langchain/core": "^1.2.0",
+    "@langchain/langgraph": "^1.4.4",
+    "@nestjs/common": "^11.1.9",
+    "@nestjs/core": "^11.1.9",
+    "@nestjs/platform-express": "^11.1.9",
+    "@nestjs/swagger": "^11.4.4",
+    "@servier-potion-lab/db": "workspace:*",
+    "@servier-potion-lab/domain": "workspace:*",
+    "@servier-potion-lab/potion-tools": "workspace:*",
+    "ai": "^6.0.208",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
+    "express": "^5.2.1",
+    "openai": "^6.44.0",
+    "reflect-metadata": "^0.2.2",
+    "rxjs": "^7.8.2",
+    "swagger-ui-express": "^5.0.1",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@nestjs/testing": "^11.1.9",
+    "@servier-potion-lab/typescript-config": "workspace:*",
+    "@types/express": "^5.0.6",
+    "@types/node": "^24.10.1",
+    "@types/supertest": "^6.0.3",
+    "supertest": "^7.1.4",
+    "tsc-watch": "^7.2.0",
+    "typescript": "^5.9.3"
+  }
+}

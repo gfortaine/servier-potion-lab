@@ -1,0 +1,10 @@
+{
+  "extends": "@servier-potion-lab/typescript-config/library.json",
+  "compilerOptions": {
+    "lib": ["ES2022", "DOM"],
+    "rootDir": "src",
+    "outDir": "dist",
+    "types": ["node"]
+  },
+  "include": ["src/**/*.ts"]
+}

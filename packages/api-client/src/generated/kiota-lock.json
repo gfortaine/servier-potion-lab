@@ -1,0 +1,34 @@
+{
+  "descriptionHash": "26E9270C95E4E18D0A91A1485137A8B1751AD863192EC040F3E9459E0E364AD56036E20CED85C252DD218D03C4F3FE56020552FFAE8283A9A6D06DFD680C04E9",
+  "descriptionLocation": "../../openapi/servier-openapi.json",
+  "lockFileVersion": "1.0.0",
+  "kiotaVersion": "1.32.2",
+  "clientClassName": "ServierPotionLabClient",
+  "typeAccessModifier": "Public",
+  "clientNamespaceName": "ApiSdk",
+  "language": "TypeScript",
+  "usesBackingStore": false,
+  "excludeBackwardCompatible": true,
+  "includeAdditionalData": true,
+  "disableSSLValidation": false,
+  "serializers": [
+    "Microsoft.Kiota.Serialization.Json.JsonSerializationWriterFactory",
+    "Microsoft.Kiota.Serialization.Text.TextSerializationWriterFactory",
+    "Microsoft.Kiota.Serialization.Form.FormSerializationWriterFactory",
+    "Microsoft.Kiota.Serialization.Multipart.MultipartSerializationWriterFactory"
+  ],
+  "deserializers": [
+    "Microsoft.Kiota.Serialization.Json.JsonParseNodeFactory",
+    "Microsoft.Kiota.Serialization.Text.TextParseNodeFactory",
+    "Microsoft.Kiota.Serialization.Form.FormParseNodeFactory"
+  ],
+  "structuredMimeTypes": [
+    "application/json",
+    "text/plain;q=0.9",
+    "application/x-www-form-urlencoded;q=0.2",
+    "multipart/form-data;q=0.1"
+  ],
+  "includePatterns": [],
+  "excludePatterns": [],
+  "disabledValidationRules": []
+}

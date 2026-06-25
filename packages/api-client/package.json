@@ -1,0 +1,36 @@
+{
+  "name": "@servier-potion-lab/api-client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "generate:openapi": "pnpm --filter @servier-potion-lab/api export:openapi -- ../../packages/api-client/openapi/servier-openapi.json",
+    "generate:kiota": "node scripts/generate-kiota.mjs",
+    "generate": "pnpm generate:openapi && pnpm generate:kiota",
+    "build": "tsc -p tsconfig.json",
+    "lint": "tsc -p tsconfig.json --noEmit",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "pnpm build && node --test dist/**/*.test.js"
+  },
+  "dependencies": {
+    "@microsoft/kiota-abstractions": "1.0.0-preview.102",
+    "@microsoft/kiota-bundle": "1.0.0-preview.102",
+    "@microsoft/kiota-serialization-form": "1.0.0-preview.102",
+    "@microsoft/kiota-serialization-json": "1.0.0-preview.102",
+    "@microsoft/kiota-serialization-multipart": "1.0.0-preview.102",
+    "@microsoft/kiota-serialization-text": "1.0.0-preview.102"
+  },
+  "devDependencies": {
+    "@servier-potion-lab/typescript-config": "workspace:*",
+    "@types/node": "^24.10.1",
+    "typescript": "^5.9.3"
+  }
+}
