@@ -5,7 +5,7 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "build": "node ../../scripts/vercel-db-release.mjs && tsc -p tsconfig.json",
+    "build": "pnpm --filter @servier-potion-lab/domain build && pnpm --filter @servier-potion-lab/potion-tools build && pnpm --filter @servier-potion-lab/db build && node ../../scripts/vercel-db-release.mjs && tsc -p tsconfig.json",
     "dev": "tsc-watch -p tsconfig.json --onSuccess \"node dist/main.js\"",
     "lint": "tsc -p tsconfig.json --noEmit",
     "typecheck": "tsc -p tsconfig.json --noEmit",
