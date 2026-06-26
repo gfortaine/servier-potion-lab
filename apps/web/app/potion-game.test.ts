@@ -239,7 +239,7 @@ test("lets the assistant chat collapse to a bubble and reopen", async () => {
   expect(screen.getByTestId("codex-chat").className).not.toContain("is-collapsed");
 });
 
-test("renders the three DOCX pages as focused Next.js views", async () => {
+test("renders the spec-mapped pages as focused Next.js views", async () => {
   const { rerender } = render(React.createElement(PotionGame, { view: "composer" }));
 
   await screen.findByTestId("cauldron-panel");

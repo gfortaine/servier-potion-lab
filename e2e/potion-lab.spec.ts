@@ -85,7 +85,7 @@ test("supports the alchemical theatre UX flow without visual collisions", async 
   await expect(page.getByTestId("cauldron-panel")).toHaveCount(0);
 });
 
-test("exposes the three DOCX pages as focused App Router routes", async ({ page, request }) => {
+test("exposes the spec-mapped pages as focused App Router routes", async ({ page, request }) => {
   await page.goto("/fr/composer-une-potion");
   await expectServierShell(page);
   await expect(pageNav(page).getByRole("link", { name: /Composer/ })).toHaveAttribute("aria-current", "page");

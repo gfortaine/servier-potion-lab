@@ -23,7 +23,7 @@ The repo uses pnpm 10 and Turborepo so Next.js, NestJS, Prisma, and shared packa
 
 The UI vendors the public SERVIER header SVG logo and favicon PNGs locally under `apps/web/public/brand/` for the interview demo, avoiding hotlinks to `servier.com` during tests. Typography uses Poppins via Fontsource because SERVIER’s public theme declares `Poppins, sans-serif`; the palette remains the established SERVIER blue/coral/white clinical system. Live lab metrics remain inside the client `PotionGame` because they depend on API state; the layout shell only owns route-stable chrome.
 
-The route journey mirrors the DOCX pages: the dashboard is a launchpad with KPIs, `/composer` owns exact-three composition, `/recipes` owns discovered recipes and created potions, and `/inventory` owns quantities/recharge. Successful potion validation navigates from composer to recipes with `created` and `recipe` search params so the success banner, highlighted recipe, and highlighted ledger entry survive the App Router remount.
+The route journey mirrors the technical-test flow: the dashboard is a launchpad with KPIs, `/composer` owns exact-three composition, `/recipes` owns discovered recipes and created potions, and `/inventory` owns quantities/recharge. Successful potion validation navigates from composer to recipes with `created` and `recipe` search params so the success banner, highlighted recipe, and highlighted ledger entry survive the App Router remount.
 
 ## Hexagonal runtime flow
 

@@ -32,6 +32,18 @@ The mandatory verification path is local and does not require live LLM, Azure Op
 
 The web app pins the patched stable Next.js 16 line for final handoff rather than a canary release.
 
+## Documentation map
+
+| Goal | Read |
+|---|---|
+| Run or review the project | This README |
+| Understand the architecture and runtime boundaries | `docs/architecture.md` |
+| Deploy or operate the Vercel demo | `docs/vercel-deployment.md` |
+| Discuss an Azure enterprise trajectory | `docs/azure-deployment.md` |
+| Review technical decisions | `docs/adr/` |
+| Review design system and Stitch handoff | `docs/design/stitch/` |
+| Read the Tech Lead IA delivery note | `docs/note-technique-servier-architecture-ia.md` |
+
 ## Vercel Services deployment
 
 This repo includes a root `vercel.json` using Vercel Services:
