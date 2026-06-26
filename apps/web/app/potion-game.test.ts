@@ -226,6 +226,95 @@ test("streams regular assistant chat replies without forcing a potion tool", asy
   expect(screen.getByTestId("ingredient-noix-de-coco").textContent).toContain("Stock disponible : 3");
 });
 
+test("shows a live writing state while waiting for the assistant stream", async () => {
+  const user = userEvent.setup();
+  let resolveChat: ((response: Response) => void) | undefined;
+  vi.stubGlobal(
+    "fetch",
+    vi.fn((input: string | URL | Request, init?: RequestInit) => {
+      const url = new URL(input.toString());
+      if (url.pathname === "/assistant/chat/stream" && init?.method === "POST") {
+        return new Promise<Response>((resolve) => {
+          resolveChat = resolve;
+        });
+      }
+
+      return handleFetch(input, init);
+    })
+  );
+
+  render(React.createElement(PotionGame, { view: "composer" }));
+
+  await screen.findByTestId("ingredient-noix-de-coco");
+  await user.type(screen.getByTestId("codex-chat-input"), "hi");
+  await user.click(screen.getByTestId("codex-chat-submit"));
+
+  expect((await screen.findByTestId("codex-chat-streaming")).textContent).toContain("Analyse de la demande");
+  expect((screen.getByTestId("codex-chat-submit") as HTMLButtonElement).disabled).toBe(true);
+
+  resolveChat?.(
+    uiMessageResponse((write) => {
+      writeTextPart(write, "Réponse en direct.");
+    })
+  );
+
+  await screen.findByText("Réponse en direct.");
+  await waitFor(() => {
+    expect(screen.queryByTestId("codex-chat-streaming")).toBeNull();
+  });
+});
+
+test("keeps the writing state on the current assistant turn after a previous reply", async () => {
+  const user = userEvent.setup();
+  let chatRequestCount = 0;
+  let resolveSecondChat: ((response: Response) => void) | undefined;
+  vi.stubGlobal(
+    "fetch",
+    vi.fn((input: string | URL | Request, init?: RequestInit) => {
+      const url = new URL(input.toString());
+      if (url.pathname === "/assistant/chat/stream" && init?.method === "POST") {
+        chatRequestCount += 1;
+        if (chatRequestCount === 1) {
+          return uiMessageResponse((write) => {
+            writeTextPart(write, "Première réponse.");
+          });
+        }
+
+        return new Promise<Response>((resolve) => {
+          resolveSecondChat = resolve;
+        });
+      }
+
+      return handleFetch(input, init);
+    })
+  );
+
+  render(React.createElement(PotionGame, { view: "composer" }));
+
+  await screen.findByTestId("ingredient-noix-de-coco");
+  await user.type(screen.getByTestId("codex-chat-input"), "hi");
+  await user.click(screen.getByTestId("codex-chat-submit"));
+  await screen.findByText("Première réponse.");
+
+  await user.type(screen.getByTestId("codex-chat-input"), "encore");
+  await user.click(screen.getByTestId("codex-chat-submit"));
+
+  const pendingMessage = await screen.findByTestId("codex-chat-pending-message");
+  expect(pendingMessage.textContent).toContain("Analyse de la demande");
+  expect(screen.getByText("Première réponse.").closest("article")?.textContent).not.toContain("Analyse de la demande");
+
+  resolveSecondChat?.(
+    uiMessageResponse((write) => {
+      writeTextPart(write, "Deuxième réponse en direct.");
+    })
+  );
+
+  await screen.findByText("Deuxième réponse en direct.");
+  await waitFor(() => {
+    expect(screen.queryByTestId("codex-chat-streaming")).toBeNull();
+  });
+});
+
 test("lets the assistant chat collapse to a bubble and reopen", async () => {
   const user = userEvent.setup();
   render(React.createElement(PotionGame, { view: "composer" }));

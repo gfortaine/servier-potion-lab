@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport, type UIMessage } from "ai";
 import {
@@ -405,6 +405,7 @@ function CodexChat({
 }): React.ReactElement {
   const [collapsed, setCollapsed] = useState(false);
   const [input, setInput] = useState("");
+  const logEndRef = useRef<HTMLDivElement>(null);
   const transport = useMemo(
     () =>
       new DefaultChatTransport({
@@ -429,6 +430,20 @@ function CodexChat({
     }
   });
   const busy = status === "submitted" || status === "streaming";
+  const conversationMessages =
+    messages.length > 1 ? messages.filter((message) => message.id !== "codex-wake") : messages;
+  const visibleMessages = conversationMessages.slice(-4);
+  const lastMessage = messages[messages.length - 1];
+  const activeAssistantMessageId =
+    busy && lastMessage?.role === "assistant" && lastMessage.id !== "codex-wake" ? lastMessage.id : undefined;
+  const showPendingAssistantMessage = busy && lastMessage?.role === "user";
+
+  useEffect(() => {
+    const logEnd = logEndRef.current;
+    if (!collapsed && logEnd && typeof logEnd.scrollIntoView === "function") {
+      logEnd.scrollIntoView({ block: "end" });
+    }
+  }, [collapsed, messages, status, error]);
 
   async function submitMessage(): Promise<void> {
     const message = input.trim();
@@ -475,30 +490,57 @@ function CodexChat({
         </button>
       </div>
       <div className="codex-chat-log" aria-live="polite">
-        {messages.slice(-4).map((message) => (
-          <article className={`codex-message codex-message-${message.role}`} key={message.id}>
-            <span className="codex-message-role">
-              {message.role === "user"
-                ? locale === "fr"
-                  ? "Vous"
-                  : "You"
-                : locale === "fr"
-                  ? "Assistant"
-                  : "Assistant"}
-            </span>
-            {readTextParts(message).map((text, index) => (
-              <p key={`${message.id}-text-${index}`}>{text}</p>
-            ))}
-            {readToolCalls(message).map((toolCall, index) => (
-              <CodexToolCard key={`${message.id}-${toolCall.name}-${index}`} locale={locale} toolCall={toolCall} />
-            ))}
+        {visibleMessages.map((message) => {
+          const textParts = readTextParts(message);
+          const showWritingState = message.role === "assistant" && message.id === activeAssistantMessageId;
+          const showWritingCue = showWritingState && textParts.length === 0;
+          const showWritingCaret = showWritingState && textParts.length > 0;
+
+          return (
+            <article
+              className={`codex-message codex-message-${message.role}`}
+              key={showWritingState ? "active-assistant" : message.id}
+            >
+              <span className="codex-message-role">
+                {message.role === "user"
+                  ? locale === "fr"
+                    ? "Vous"
+                    : "You"
+                  : locale === "fr"
+                    ? "Assistant"
+                    : "Assistant"}
+              </span>
+              {textParts.map((text, index) => (
+                <p key={`${message.id}-text-${index}`}>
+                  {text}
+                  {showWritingCaret && index === textParts.length - 1 ? (
+                    <span className="codex-stream-caret" aria-hidden="true" />
+                  ) : null}
+                </p>
+              ))}
+              {showWritingCue ? <CodexWritingCue locale={locale} status={status} /> : null}
+              {readToolCalls(message).map((toolCall, index) => (
+                <CodexToolCard key={`${message.id}-${toolCall.name}-${index}`} locale={locale} toolCall={toolCall} />
+              ))}
+            </article>
+          );
+        })}
+        {showPendingAssistantMessage ? (
+          <article
+            className="codex-message codex-message-assistant"
+            data-testid="codex-chat-pending-message"
+            key="active-assistant"
+          >
+            <span className="codex-message-role">{locale === "fr" ? "Assistant" : "Assistant"}</span>
+            <CodexWritingCue locale={locale} status={status} />
           </article>
-        ))}
+        ) : null}
         {error ? (
           <article className="codex-message codex-message-assistant">
             <p>{error.message}</p>
           </article>
         ) : null}
+        <div ref={logEndRef} aria-hidden="true" />
       </div>
       <form
         className="codex-chat-form"
@@ -530,6 +572,50 @@ function CodexChat({
         </small>
       </form>
     </aside>
+  );
+}
+
+function CodexWritingCue({
+  locale,
+  status
+}: {
+  readonly locale: Locale;
+  readonly status: "submitted" | "streaming" | "ready" | "error";
+}): React.ReactElement {
+  const label =
+    status === "submitted"
+      ? locale === "fr"
+        ? "Analyse de la demande"
+        : "Reading the request"
+      : locale === "fr"
+        ? "Réponse en cours"
+        : "Writing the response";
+  const detail =
+    status === "submitted"
+      ? locale === "fr"
+        ? "L'assistant vérifie la formule et le stock."
+        : "The assistant is checking the formula and stock."
+      : locale === "fr"
+        ? "Le texte et les cartes d'action arrivent en direct."
+        : "Text and action cards are streaming live.";
+
+  return (
+    <div
+      aria-label={label}
+      className="codex-writing-row"
+      data-testid="codex-chat-streaming"
+      role="status"
+    >
+      <span className="codex-writing-vials" aria-hidden="true">
+        <span />
+        <span />
+        <span />
+      </span>
+      <div>
+        <strong>{label}</strong>
+        <p>{detail}</p>
+      </div>
+    </div>
   );
 }
 
